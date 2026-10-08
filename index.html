@@ -1,0 +1,1055 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Mind</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='46' fill='%231b1650'/><circle cx='50' cy='50' r='31' fill='none' stroke='%239b8cff' stroke-width='7'/><circle cx='50' cy='50' r='14' fill='%23ff6fa8'/></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;600;800&family=Unbounded:wght@600;800&display=swap">
+<script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js"></script>
+<style>
+:root{
+  --bg:#0d1030; --panel:rgba(255,255,255,.055); --panel2:rgba(255,255,255,.09); --line:rgba(255,255,255,.13);
+  --ink:#eef0ff; --muted:#9ea3cf; --accent:#8f7dff; --accent-d:#5f4fd0; --pink:#ff6fa8; --gold:#ffc65c; --gold-d:#c98f22;
+  --green:#33c48d; --green-d:#1d8a5f; --red:#ff5c6c; --red-d:#b8303f;
+  --cw:clamp(54px, 7.6vw, 84px); --pw:clamp(100px, 14vw, 148px);
+}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{
+  font-family:"Be Vietnam Pro",system-ui,"Segoe UI",sans-serif;color:var(--ink);
+  background:
+    radial-gradient(1100px 700px at 15% -10%,#2c2474 0,transparent 60%),
+    radial-gradient(900px 600px at 110% 110%,#3d1748 0,transparent 60%),
+    var(--bg);
+  background-attachment:fixed;
+}
+body::before{
+  content:"";position:fixed;inset:0;pointer-events:none;opacity:.55;
+  background-image:
+    radial-gradient(1px 1px at 20px 30px,#fff,transparent),radial-gradient(1px 1px at 140px 90px,#fff,transparent),
+    radial-gradient(1.5px 1.5px at 230px 170px,#cfc8ff,transparent),radial-gradient(1px 1px at 70px 230px,#fff,transparent),
+    radial-gradient(1px 1px at 280px 270px,#ffd1e4,transparent),radial-gradient(1px 1px at 190px 20px,#fff,transparent);
+  background-size:310px 310px;
+}
+button{font-family:inherit;cursor:pointer}
+.hidden{display:none!important}
+section{position:relative;z-index:1}
+
+/* ---------- Lobby ---------- */
+#lobby{min-height:100vh;display:grid;place-items:center;padding:24px 16px}
+.lobby-card{
+  width:100%;max-width:430px;background:rgba(22,20,62,.82);border-radius:28px;padding:26px 24px;
+  box-shadow:0 20px 60px rgba(0,0,0,.45);text-align:center;border:1px solid var(--line);backdrop-filter:blur(6px);
+}
+.logoCards{display:flex;justify-content:center;height:96px;margin-top:4px}
+.logoCards .card{--cw:58px;margin:0 -8px}
+.logoCards .card:nth-child(1){transform:rotate(-14deg) translateY(10px)}
+.logoCards .card:nth-child(3){transform:rotate(14deg) translateY(10px)}
+h1{margin:14px 0 0;font-family:"Unbounded",sans-serif;font-weight:800;font-size:2.5rem;line-height:1;
+  background:linear-gradient(90deg,#b9adff,#ff8fbd);-webkit-background-clip:text;background-clip:text;color:transparent}
+.tag{color:var(--muted);margin:6px 0 16px}
+label{display:block;text-align:left;font-weight:700;font-size:.95rem;margin:12px 0 4px}
+input{
+  width:100%;font:inherit;font-size:1.05rem;padding:10px 14px;border-radius:12px;
+  border:1px solid var(--line);background:rgba(255,255,255,.07);color:var(--ink);outline:none;
+}
+input:focus{border-color:var(--accent)}
+#codeInput{text-transform:uppercase;letter-spacing:4px;text-align:center;font-weight:800}
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:6px;border:0;border-radius:14px;
+  padding:10px 16px;font-size:1.02rem;font-weight:800;color:#fff;background:var(--accent);
+  box-shadow:0 4px 0 var(--accent-d);transition:transform .08s, box-shadow .08s, filter .15s;
+}
+.btn:hover:not(:disabled){filter:brightness(1.08)}
+.btn:active:not(:disabled){transform:translateY(3px);box-shadow:0 1px 0 var(--accent-d)}
+.btn.green{background:var(--green);box-shadow:0 4px 0 var(--green-d)}
+.btn.gold{background:var(--gold);color:#3a2600;box-shadow:0 4px 0 var(--gold-d)}
+.btn.red{background:var(--red);box-shadow:0 4px 0 var(--red-d)}
+.btn.ghost{background:rgba(255,255,255,.06);color:var(--ink);border:1px solid var(--line);box-shadow:none;padding:6px 12px;font-size:.95rem}
+.btn.big{font-size:1.2rem;padding:13px 26px;border-radius:16px}
+.btn:disabled{opacity:.4;cursor:default}
+.btn kbd{font:inherit;font-size:.72rem;opacity:.7;font-weight:600;border:1px solid rgba(255,255,255,.4);border-radius:5px;padding:0 4px;margin-left:2px}
+.btn.gold kbd{border-color:rgba(58,38,0,.35)}
+.btn.gold .shu{color:#3a2600}
+.row{display:flex;gap:10px;margin-top:14px}
+.row>*{flex:1}
+.or{margin:18px 0 0;color:var(--muted);display:flex;align-items:center;gap:10px}
+.or:before,.or:after{content:"";flex:1;height:1px;background:var(--line)}
+.msg{min-height:1.4em;margin-top:12px;color:var(--red);font-weight:700}
+.seg{display:flex;gap:6px;justify-content:center;align-items:center;margin-top:12px;font-weight:700;color:var(--muted);flex-wrap:wrap}
+.seg button{border:1px solid var(--line);background:rgba(255,255,255,.06);border-radius:10px;padding:3px 12px;font-weight:800;color:var(--ink)}
+.seg button.on{background:var(--gold);border-color:var(--gold);color:#3a2600}
+.waiting .code{
+  font-family:"Unbounded",sans-serif;font-size:2.3rem;font-weight:800;letter-spacing:8px;color:#d6ceff;
+  background:rgba(143,125,255,.12);border:2px dashed var(--accent);border-radius:18px;padding:8px 10px;margin:10px 0;
+}
+.waiting .link{font-size:.85rem;word-break:break-all;color:var(--muted);margin:8px 0}
+.seats{display:flex;flex-direction:column;gap:6px;margin-top:14px;text-align:left}
+.seat{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:12px;background:var(--panel2);font-weight:700}
+.seat .x{margin-left:auto;border:0;background:none;color:var(--red);font-size:1.1rem;font-weight:800}
+.seat.empty{background:none;border:1px dashed var(--line);color:var(--muted);font-weight:600}
+.tagm{font-size:.8rem;color:var(--muted);font-weight:700}
+.dots:after{content:"";animation:dots 1.4s steps(4) infinite}
+@keyframes dots{0%{content:""}25%{content:"."}50%{content:".."}75%{content:"..."}}
+.pdot{width:12px;height:12px;border-radius:50%;background:var(--pc);flex:none;box-shadow:0 0 8px var(--pc)}
+
+/* ---------- Cards ---------- */
+.card{
+  --h:220; width:var(--cw); aspect-ratio:5/7; border-radius:calc(var(--cw)*.13); position:relative; flex:none;
+  background:
+    radial-gradient(circle at 28% 18%,hsl(var(--h) 100% 78% / .75),transparent 50%),
+    linear-gradient(155deg,hsl(var(--h) 78% 56%),hsl(calc(var(--h) + 35) 70% 28%));
+  box-shadow:0 6px 16px rgba(0,0,0,.4), inset 0 0 0 1.5px rgba(255,255,255,.28);
+  display:grid; place-items:center; color:#fff; user-select:none;
+  font-family:"Unbounded",sans-serif; font-weight:800; font-size:calc(var(--cw)*.36); text-shadow:0 2px 8px rgba(0,0,0,.35);
+}
+.card::before{content:"";position:absolute;inset:7%;border-radius:calc(var(--cw)*.09);border:1px solid rgba(255,255,255,.3)}
+.card .k{position:absolute;font-size:.3em;top:10%;left:13%;opacity:.85;font-weight:600}
+.card .k.b{top:auto;left:auto;bottom:10%;right:13%;transform:rotate(180deg)}
+.card.back{
+  background:
+    radial-gradient(circle,#ff6fa8 0 9%,transparent 10%),
+    repeating-radial-gradient(circle,#3a2f9a 0 7%,#211b62 7% 14%);
+}
+
+/* ---------- Game ---------- */
+#game{max-width:1180px;margin:0 auto;padding:10px 16px 24px}
+header{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+header .title{font-family:"Unbounded",sans-serif;font-weight:800;font-size:1.5rem;line-height:1;
+  background:linear-gradient(90deg,#b9adff,#ff8fbd);-webkit-background-clip:text;background-clip:text;color:transparent}
+header .info{font-weight:600;color:var(--muted);font-size:.95rem}
+header .info b{color:var(--ink)}
+header .sp{flex:1}
+.chip{display:inline-flex;align-items:center;gap:5px;padding:4px 12px;border-radius:999px;font-weight:800;background:var(--panel2);border:1px solid var(--line)}
+.chip.lvc{display:inline-block;white-space:nowrap}
+.chip.lvc b{font-family:"Unbounded",sans-serif}
+.chip .hrt{color:var(--red)}
+.chip .hrt.e{color:rgba(255,255,255,.18)}
+.shu{width:1em;height:1em;vertical-align:-.12em;color:var(--gold)}
+.shu.e{color:rgba(255,255,255,.18)}
+.layout{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:16px;align-items:start}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:12px 14px;backdrop-filter:blur(4px)}
+.panel+.panel{margin-top:12px}
+.ptitle{display:flex;align-items:center;gap:8px;font-weight:800;font-size:1.02rem;margin-bottom:8px;flex-wrap:wrap}
+.ptitle .sub{font-weight:600;color:var(--muted);font-size:.88rem}
+.ptitle .sp{flex:1}
+
+/* table */
+.table{padding:14px;transition:box-shadow .5s}
+.table.playing{animation:breathe 4.5s ease-in-out infinite}
+@keyframes breathe{50%{box-shadow:0 0 50px rgba(143,125,255,.22), inset 0 0 40px rgba(143,125,255,.08)}}
+.mates{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.mate{flex:1 1 160px;max-width:270px;border:1px solid var(--line);border-radius:14px;padding:8px 10px;background:var(--panel);transition:.25s}
+.mate.just{border-color:var(--pc);box-shadow:0 0 18px color-mix(in srgb,var(--pc) 45%,transparent)}
+.mh{display:flex;align-items:center;gap:7px;font-weight:800;min-width:0}
+.mh .nm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mrow{display:flex;align-items:center;gap:8px;margin-top:6px;min-height:30px}
+.backs{display:flex;padding-left:8px}
+.cb{width:19px;height:27px;border-radius:4px;margin-left:-8px;border:1px solid rgba(255,255,255,.35);
+  background:radial-gradient(circle,#ff6fa8 0 12%,transparent 14%),repeating-radial-gradient(circle,#3a2f9a 0 18%,#211b62 18% 36%);box-shadow:0 2px 4px rgba(0,0,0,.35)}
+.mcount{font-weight:800;color:var(--muted);font-size:.9rem}
+.st{margin-left:auto;font-size:.82rem;font-weight:800;padding:2px 8px;border-radius:999px;background:var(--panel2);color:var(--muted);white-space:nowrap}
+.st.ok{background:rgba(51,196,141,.18);color:#7ff0c3}
+.st.no{background:rgba(255,92,108,.18);color:#ffa3ad}
+.off{color:var(--red);font-size:.78rem;font-weight:800}
+.revealed{display:flex;gap:4px;flex-wrap:wrap;margin-top:6px}
+.revealed .card{--cw:30px}
+
+.banner{text-align:center;margin:14px auto 0;max-width:620px;min-height:3em}
+.note{display:inline-block;padding:6px 14px;border-radius:12px;background:var(--panel2);border:1px solid var(--line);font-weight:700;margin-bottom:6px}
+.note.mistake,.note.lose{background:rgba(255,92,108,.14);border-color:rgba(255,92,108,.45);color:#ffc1c8}
+.note.level,.note.win{background:rgba(255,198,92,.14);border-color:rgba(255,198,92,.45);color:#ffe0a3}
+.note.star,.note.propose{background:rgba(255,198,92,.1);border-color:rgba(255,198,92,.35)}
+.bn{color:var(--muted);font-weight:600}
+.bn b{color:var(--ink)}
+
+.center{display:flex;align-items:center;justify-content:center;gap:22px;margin:14px 0 4px;flex-wrap:wrap}
+.side{flex:1 1 140px;max-width:220px;display:flex;flex-direction:column;gap:6px}
+.side.l{align-items:flex-end;text-align:right}
+.side .lbl{font-size:.82rem;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.06em}
+.prog{width:100%;max-width:170px;height:8px;border-radius:99px;background:rgba(255,255,255,.1);overflow:hidden}
+.prog i{display:block;height:100%;background:linear-gradient(90deg,var(--accent),var(--pink));border-radius:99px;transition:width .4s}
+.big{font-family:"Unbounded",sans-serif;font-weight:800;font-size:1.5rem}
+.pile{position:relative;width:calc(var(--pw)*1.15);height:calc(var(--pw)*1.55);flex:none}
+.pile .card{--cw:var(--pw);position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) rotate(var(--r))}
+.pile .card.old{filter:brightness(.6) saturate(.8)}
+.pile .card.enter{animation:land .45s cubic-bezier(.2,.8,.3,1.2)}
+@keyframes land{from{transform:translate(-50%,10%) rotate(0deg) scale(1.35);opacity:0}}
+.pile.ghost .card{filter:grayscale(.6) brightness(.55)}
+.pile .slot{position:absolute;inset:6% 7%;border:2px dashed var(--line);border-radius:16px;display:grid;place-items:center;
+  color:var(--muted);font-weight:700;text-align:center;padding:10px;font-size:.92rem}
+.pile .badge{position:absolute;left:50%;bottom:-6px;transform:translateX(-50%);background:var(--gold);color:#3a2600;font-weight:800;
+  padding:2px 10px;border-radius:999px;font-size:.85rem;white-space:nowrap;z-index:5}
+.discards{display:flex;flex-wrap:wrap;gap:4px}
+.dc{--cw:32px;font-size:12px;opacity:.85}
+.dc .k{display:none}
+.dc::after{position:absolute;top:-5px;right:-5px;width:15px;height:15px;border-radius:50%;display:grid;place-items:center;
+  font:800 9px/1 "Be Vietnam Pro",sans-serif;text-shadow:none}
+.dc.x::after{content:"✕";background:var(--red);color:#fff}
+.dc.s::after{content:"✦";background:var(--gold);color:#3a2600}
+.muted{color:var(--muted)}
+.small{font-size:.85rem}
+
+/* hand */
+.hand{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;min-height:calc(var(--cw)*1.4 + 16px);padding:12px 0 4px;align-items:flex-end}
+.hand .card{transition:transform .15s, box-shadow .15s}
+.hand .card.next{transform:translateY(-10px);box-shadow:0 0 0 3px #fff,0 0 26px hsl(var(--h) 95% 65%);cursor:pointer}
+.hand .card.next:hover{transform:translateY(-14px)}
+.hand .card.deal{animation:deal .5s both;animation-delay:calc(var(--i)*70ms)}
+@keyframes deal{from{opacity:0;transform:translateY(40px) rotate(-10deg) scale(.7)}}
+.hand .empty{color:var(--muted);font-weight:700;align-self:center}
+.actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:12px;align-items:center}
+.wait{color:var(--muted);font-weight:700;text-align:center}
+.hint{color:var(--muted);font-size:.84rem;font-weight:600;margin-top:8px;text-align:center}
+
+/* side */
+.track{display:flex;flex-wrap:wrap;gap:8px 7px}
+.lv{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-weight:800;font-size:.82rem;border:2px solid var(--line);position:relative;color:var(--muted)}
+.lv.done{background:var(--accent);border-color:var(--accent);color:#fff}
+.lv.cur{border-color:var(--pink);color:#fff;box-shadow:0 0 0 3px rgba(255,111,168,.25)}
+.lv .rw{position:absolute;right:-7px;bottom:-6px;font-size:.72rem;line-height:1}
+.lv .rw .shu{width:12px;height:12px}
+.stat{display:flex;align-items:center;gap:8px;font-weight:700;margin-top:8px}
+.stat .sp{flex:1}
+.tempo{margin-top:10px;padding:8px 10px;border-radius:12px;background:var(--panel2);font-size:.9rem;font-weight:600;color:var(--muted)}
+.tempo b{color:var(--ink)}
+.log{max-height:240px;overflow:auto;font-size:.9rem;display:flex;flex-direction:column;gap:3px}
+.log div{padding:2px 0;border-bottom:1px dashed var(--line)}
+.log div.sys{color:#c8bfff;font-weight:700}
+
+/* overlay & fx */
+.overlay{position:fixed;inset:0;background:rgba(5,6,20,.6);display:grid;place-items:center;padding:16px;z-index:50}
+.modal{background:#1a1745;border-radius:24px;padding:22px 20px;max-width:560px;width:100%;border:1px solid var(--line);box-shadow:0 20px 60px rgba(0,0,0,.5);max-height:92vh;overflow:auto}
+.modal h2{margin:0 0 6px;font-family:"Unbounded",sans-serif;font-weight:800;font-size:1.6rem;text-align:center}
+.modal table{width:100%;border-collapse:collapse;margin:10px 0}
+.modal th,.modal td{padding:6px 8px;border-bottom:1px solid var(--line);text-align:right}
+.modal th:first-child,.modal td:first-child{text-align:left}
+.modal .rules{font-size:.95rem;line-height:1.5}
+.modal .rules h3{margin:12px 0 4px;color:#c8bfff}
+.modal .rules ul{margin:4px 0;padding-left:20px}
+.left{margin-top:8px}
+.left .lrow{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:6px 0}
+.left .card{--cw:30px}
+#fx{position:fixed;inset:0;pointer-events:none;z-index:40;opacity:0}
+#fx.red{background:radial-gradient(circle at 50% 45%,transparent 20%,rgba(255,40,70,.5));animation:flash 1s ease-out}
+#fx.gold{background:radial-gradient(circle at 50% 45%,rgba(255,200,90,.32),transparent 70%);animation:flash 1.4s ease-out}
+@keyframes flash{0%{opacity:1}100%{opacity:0}}
+.shake{animation:shake .5s}
+@keyframes shake{20%{transform:translateX(-9px)}40%{transform:translateX(8px)}60%{transform:translateX(-5px)}80%{transform:translateX(3px)}}
+.toast{
+  position:fixed;left:50%;bottom:20px;transform:translate(-50%,40px);opacity:0;background:#fff;color:#1a1745;
+  padding:10px 16px;border-radius:12px;font-weight:700;transition:.25s;z-index:60;max-width:calc(100vw - 32px);text-align:center;pointer-events:none;
+}
+.toast.show{transform:translate(-50%,0);opacity:1}
+
+@media (max-width:900px){
+  .layout{grid-template-columns:1fr}
+}
+@media (max-width:600px){
+  :root{--cw:clamp(46px,14vw,60px);--pw:88px}
+  #game{padding:8px 16px 20px}
+  .panel{padding:10px}
+  header{gap:6px}
+  header .title{font-size:1.2rem}
+  .mates{gap:6px}
+  .mate{flex:1 1 calc(50% - 6px);min-width:0;padding:6px 8px}
+  .mrow{flex-wrap:wrap;gap:4px 6px}
+  .st{margin-left:0}
+  .banner{font-size:.9rem;margin-top:10px}
+  .center{display:grid;grid-template-columns:1fr 1fr;gap:10px;justify-items:center;margin-top:8px}
+  .pile{grid-column:1/-1;order:-1}
+  .side,.side.l{max-width:none;align-items:center;text-align:center}
+  .big{font-size:1.2rem}
+  .discards{justify-content:center}
+  .handPanel{position:sticky;bottom:0;z-index:5;background:rgba(20,18,58,.94);box-shadow:0 -10px 30px rgba(0,0,0,.4)}
+  .hand{gap:6px;padding-top:10px}
+  .hint{display:none}
+  .btn.big{font-size:1.05rem;padding:11px 16px}
+}
+</style>
+</head>
+<body>
+
+<!-- ============ LOBBY ============ -->
+<section id="lobby">
+  <div class="lobby-card">
+    <div id="lobbyMain">
+      <div class="logoCards" id="logoCards"></div>
+      <h1>The Mind</h1>
+      <p class="tag">Hợp tác không lời · đánh bài 1–100 theo thứ tự · 2–4 người</p>
+      <label for="nameInput">Tên của bạn</label>
+      <input id="nameInput" maxlength="16" placeholder="VD: Hoàng" autocomplete="off">
+      <div class="row"><button class="btn" id="createBtn">Tạo phòng</button></div>
+      <div class="or">hoặc vào phòng của bạn bè</div>
+      <label for="codeInput">Mã phòng</label>
+      <input id="codeInput" maxlength="5" placeholder="ABCDE" autocomplete="off">
+      <div class="row"><button class="btn green" id="joinBtn">Vào phòng</button></div>
+      <div class="or">hoặc</div>
+      <div class="seg" id="botSeg">Số máy:
+        <button data-n="1" class="on">1</button><button data-n="2">2</button><button data-n="3">3</button>
+      </div>
+      <div class="seg" id="tempoSeg">Nhịp đếm của máy:
+        <button data-t="slow">Chậm</button><button data-t="mid" class="on">Vừa</button><button data-t="fast">Nhanh</button>
+      </div>
+      <div class="row"><button class="btn gold" id="botBtn">Chơi với máy</button></div>
+      <div class="row"><button class="btn ghost" id="rulesBtn0">Xem luật chơi</button></div>
+      <div class="msg" id="lobbyMsg"></div>
+    </div>
+    <div id="lobbyWait" class="waiting hidden">
+      <h2 style="margin:6px 0 0" id="waitTitle">Phòng đã tạo!</h2>
+      <p class="tag" id="waitTag">Gửi mã này cho bạn bè (tối đa 4 người)</p>
+      <div class="code" id="waitCode">-----</div>
+      <div class="link" id="waitLink"></div>
+      <div class="row" id="copyRow"><button class="btn ghost" id="copyBtn">Sao chép link</button></div>
+      <div class="seats" id="seatList"></div>
+      <div id="hostCtl">
+        <div class="row"><button class="btn gold" id="addBotBtn">+ Thêm máy</button><button class="btn green" id="startBtn">Bắt đầu</button></div>
+      </div>
+      <p class="tag" style="margin-top:14px" id="waitNote">Đang chờ người chơi<span class="dots"></span></p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ GAME ============ -->
+<section id="game" class="hidden">
+  <header>
+    <span class="title">The Mind</span>
+    <span class="info" id="roomInfo"></span>
+    <span class="chip lvc" id="lvlChip"></span>
+    <span class="chip" id="livesChip" title="Mạng"></span>
+    <span class="chip" id="starsChip" title="Phi tiêu"></span>
+    <span class="sp"></span>
+    <button class="btn ghost" id="musicBtn" title="Bật/tắt nhạc nền">🎵</button>
+    <button class="btn ghost" id="sndBtn" title="Bật/tắt âm thanh">🔔</button>
+    <button class="btn ghost" id="rulesBtn">Luật</button>
+  </header>
+  <div class="layout">
+    <main>
+      <div class="panel table" id="table">
+        <div class="mates" id="mates"></div>
+        <div class="banner" id="banner"></div>
+        <div class="center">
+          <div class="side l" id="sideL"></div>
+          <div class="pile" id="pile"></div>
+          <div class="side r" id="sideR"></div>
+        </div>
+      </div>
+      <div class="panel handPanel">
+        <div class="ptitle">🃏 Bài của bạn <span class="sub" id="handSub"></span></div>
+        <div class="hand" id="hand"></div>
+        <div class="actions" id="actions"></div>
+        <div class="hint" id="hint"></div>
+      </div>
+    </main>
+    <aside>
+      <div class="panel">
+        <div class="ptitle">🧭 Tiến trình <span class="sp"></span><span class="sub" id="lvSub"></span></div>
+        <div class="track" id="track"></div>
+        <div id="stats"></div>
+      </div>
+      <div class="panel">
+        <div class="ptitle">📜 Nhật ký</div>
+        <div class="log" id="log"></div>
+      </div>
+    </aside>
+  </div>
+</section>
+
+<div id="fx"></div>
+<div id="overlay" class="overlay hidden"><div class="modal" id="modal"></div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ================= RULES / ENGINE ================= */
+const MAXP=4, MAXLIVES=5, MAXSTARS=3;
+const LEVELS={2:12,3:10,4:8};                              // số cấp theo số người
+const REWARD={2:"star",3:"life",5:"star",6:"life",8:"star",9:"life"};
+const PCOL=["#ff6fa8","#5cc8ff","#ffc65c","#3ad19b"];
+const BOTNAMES=["Máy Thiền","Máy Trực Giác","Máy Tĩnh Lặng"];
+const TEMPOS={slow:.4,mid:.28,fast:.18};                   // giây cho mỗi số máy đếm
+const range = n => Array.from({length:n},(_,i)=>i);
+
+function rnd(n){ const a=new Uint32Array(1); crypto.getRandomValues(a); return a[0]%n; }
+function shuffle(a){ for(let i=a.length-1;i>0;i--){ const j=rnd(i+1); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+const topCard = st => st.pile.length ? st.pile[st.pile.length-1].c : 0;
+const cardsLeft = st => st.hands.reduce((s,h)=>s+h.length,0);
+
+function newGame(names, bots, tempo){
+  const st={ n:names.length, names:names.slice(), bots:bots.slice(), tempo, log:[], moveNo:0, games:0, lastN:0 };
+  resetGame(st);
+  return st;
+}
+function resetGame(st){
+  Object.assign(st,{
+    level:0, maxLevel:LEVELS[st.n], lives:st.n, stars:1, won:null, pile:[], prevPile:null, discards:[],
+    hands:[], ready:[], vote:null, last:null, lastPlay:null, refN:0, refAt:0, voteN:0, focusN:0,
+    stats:{mistakes:0, stars:0, played:0, start:Date.now(), end:0}
+  });
+  st.games++;
+  st.log.push({t:`— Ván ${st.games}: ${st.n} người · ${st.maxLevel} cấp · ${st.lives} mạng · 1 phi tiêu —`, sys:true});
+  deal(st,1);
+}
+function note(st, t, kind, extra, sys){
+  st.last=Object.assign({t, kind, id:++st.lastN}, extra||{});
+  st.log.push({t, sys:!!sys});
+}
+function deal(st, L){
+  if(st.pile.length) st.prevPile={level:st.level, cards:st.pile.slice(-4)};
+  st.level=L;
+  const deck=shuffle(range(100).map(i=>i+1));
+  st.hands=range(st.n).map(()=>deck.splice(0,L).sort((a,b)=>a-b));
+  st.pile=[]; st.discards=[];
+  st.log.push({t:`Cấp ${L}: mỗi người ${L} lá.`, sys:true});
+  toFocus(st);
+}
+function toFocus(st){ st.phase="focus"; st.ready=Array(st.n).fill(false); st.focusN++; st.vote=null; }
+function startPlay(st){ st.phase="play"; st.refN++; st.refAt=Date.now(); }
+function byPlayer(st, arr){                                 // [{c,p}] → "An 12, 15 · Bình 30"
+  const by={}; arr.forEach(x=>(by[x.p]=by[x.p]||[]).push(x.c));
+  return Object.keys(by).map(p=>`${st.names[p]} ${by[p].join(", ")}`).join(" · ");
+}
+
+function levelDone(st, pre, mistake){
+  const L=st.level;
+  if(L>=st.maxLevel){ finish(st,true,pre,mistake); return; }
+  let rw="", got=null;
+  if(REWARD[L]==="life"){ if(st.lives<MAXLIVES){ st.lives++; got="life"; rw=" Thưởng +1 ❤ mạng."; } else rw=" (Mạng đã tối đa.)"; }
+  else if(REWARD[L]==="star"){ if(st.stars<MAXSTARS){ st.stars++; got="star"; rw=" Thưởng +1 phi tiêu."; } else rw=" (Phi tiêu đã tối đa.)"; }
+  note(st, `${pre?pre+" ":""}🎉 Vượt qua cấp ${L}!${rw}`, "level", {mistake:!!mistake, got, done:L}, true);
+  deal(st, L+1);
+}
+function finish(st, won, pre, mistake){
+  st.phase="end"; st.won=won; st.stats.end=Date.now(); st.vote=null;
+  const t = won ? `🏆 Vượt qua cấp ${st.level} — cả đội chiến thắng The Mind!` : `💔 Hết mạng ở cấp ${st.level}.`;
+  note(st, (pre?pre+" ":"")+t, won?"win":"lose", {mistake:!!mistake}, true);
+}
+
+function playCard(st, p, c){
+  const h=st.hands[p];
+  if(!h.length || h[0]!==c) return;                        // lá vừa bị loại hoặc bấm trùng — bỏ qua
+  const gap=c-topCard(st), dt=Date.now()-st.refAt;
+  h.shift(); st.pile.push({c,p}); st.stats.played++;
+  st.lastPlay={c, p, n:st.stats.played};
+  const low=[];
+  st.hands.forEach((hq,q)=>{ while(hq.length && hq[0]<c) low.push({c:hq.shift(), p:q}); });
+  if(low.length){
+    st.lives--; st.stats.mistakes++;
+    st.discards.push(...low.map(x=>Object.assign(x,{why:"x"})));
+    const t=`💥 ${st.names[p]} đánh ${c} khi vẫn còn lá nhỏ hơn (${byPlayer(st,low)}) → mất 1 mạng.`;
+    if(st.lives<=0){ finish(st,false,t,true); return; }
+    if(!cardsLeft(st)){ levelDone(st,t,true); return; }
+    note(st, t, "mistake", {c,p}, true);
+    toFocus(st);                                           // sai thì cả đội tập trung lại
+    return;
+  }
+  if(!st.bots[p] && gap>=3){                               // máy học nhịp đếm của người
+    const obs=Math.min(.8, Math.max(.08, (dt-350)/1000/gap));
+    st.tempo=Math.min(.6, Math.max(.1, st.tempo*.75+obs*.25));
+  }
+  note(st, `${st.names[p]} đánh ${c}.`, "play", {c,p});
+  if(!cardsLeft(st)) levelDone(st,"",false);
+  else { st.refN++; st.refAt=Date.now(); }
+}
+function useStar(st){
+  st.stars--; st.stats.stars++;
+  const out=[];
+  st.hands.forEach((h,q)=>{ if(h.length) out.push({c:h.shift(), p:q, why:"s"}); });
+  st.discards.push(...out); st.vote=null;
+  const t=`⭐ Dùng phi tiêu — mỗi người bỏ lá thấp nhất: ${byPlayer(st,out)}.`;
+  if(!cardsLeft(st)){ levelDone(st,t,false); return; }
+  note(st, t, "star", {}, true);
+  startPlay(st);
+}
+
+function applyAction(st, p, a){
+  if(a.k==="rematch"){
+    if(st.phase!=="end") return "Ván chưa kết thúc.";
+    resetGame(st); st.moveNo++; return;
+  }
+  if(st.phase==="end") return "Ván đã kết thúc.";
+  if(a.k==="ready"){
+    if(st.phase!=="focus" || st.ready[p]) return;
+    st.ready[p]=true;
+    if(st.ready.every(Boolean)){ startPlay(st); note(st, "🤫 Bắt đầu! Không ai được nói số bài.", "start"); }
+  } else if(a.k==="play"){
+    if(st.phase==="focus") return "Chờ cả đội sẵn sàng đã.";
+    if(st.phase==="vote") return "Đang biểu quyết phi tiêu.";
+    playCard(st, p, +a.c);
+  } else if(a.k==="pause"){
+    if(st.phase!=="play") return;
+    note(st, `✋ ${st.names[p]} xin dừng lại để cả đội tập trung lại.`, "pause");
+    toFocus(st);
+  } else if(a.k==="star"){
+    if(st.phase!=="play") return "Chỉ dùng phi tiêu khi đang chơi.";
+    if(st.stars<1) return "Hết phi tiêu rồi.";
+    st.phase="vote"; st.vote={by:p, id:++st.voteN, yes:Array(st.n).fill(null)}; st.vote.yes[p]=true;
+    note(st, `⭐ ${st.names[p]} đề nghị dùng phi tiêu.`, "propose");
+  } else if(a.k==="vote"){
+    if(st.phase!=="vote" || st.vote.yes[p]!==null) return;
+    st.vote.yes[p]=!!a.y;
+    if(!a.y){ note(st, `👎 ${st.names[p]} không đồng ý dùng phi tiêu — chơi tiếp.`, "nostar"); st.vote=null; startPlay(st); }
+    else if(st.vote.yes.every(Boolean)) useStar(st);
+  } else return "Hành động lạ.";
+  st.moveNo++;
+}
+function viewFor(st, p){
+  return Object.assign({}, st, {
+    me:p, log:st.log.slice(-80),
+    counts:st.hands.map(h=>h.length),
+    hands:st.hands.map((h,i)=> i===p || st.phase==="end" ? h.slice() : null)
+  });
+}
+
+/* ================= BOT ================= */
+// Máy "đếm thầm" từ lá vừa đánh tới lá thấp nhất của mình, với nhịp st.tempo giây/số (có sai số ±10%).
+let botPlan=new Map(), botTimer=null;
+const botDelay = (st,gap) => 350 + st.tempo*1000*gap*(.9+Math.random()*.2);
+function planBots(){
+  clearTimeout(botTimer);
+  const st=state;
+  if(!st || st.phase==="end" || !st.bots.some(Boolean)){ botPlan.clear(); return; }
+  const now=Date.now(), want=[];
+  st.bots.forEach((b,p)=>{
+    if(!b) return;
+    if(st.phase==="focus" && !st.ready[p]) want.push([`r${st.focusN}.${p}`, p, {k:"ready"}, ()=>now+600+Math.random()*1100]);
+    else if(st.phase==="play" && st.hands[p].length){
+      const c=st.hands[p][0];
+      want.push([`p${st.refN}.${p}.${c}`, p, {k:"play",c}, ()=>st.refAt+botDelay(st,c-topCard(st))]);
+    }
+    else if(st.phase==="vote" && st.vote.yes[p]===null) want.push([`v${st.vote.id}.${p}`, p, {k:"vote",y:true}, ()=>now+700+Math.random()*900]);
+  });
+  const next=new Map();
+  for(const [key,p,a,at] of want) next.set(key, botPlan.get(key) || {p, a, at:at()});
+  botPlan=next;
+  let first=null;
+  for(const x of botPlan.values()) if(!first || x.at<first.at) first=x;
+  if(!first) return;
+  botTimer=setTimeout(()=>{
+    if(state!==st) return;
+    const err=applyAction(st, first.p, first.a); if(err) console.warn("bot:", err);
+    broadcast();
+  }, Math.max(0, first.at-Date.now()));
+}
+
+/* ================= NETWORK ================= */
+const PREFIX="themind-vh-";
+let peer=null, conn=null, isHost=false, myName="", roomCode="", state=null, view=null, joinTimer=null;
+let seats=[];                                   // host: [{name, bot, id, conn}] — ghế 0 là chủ phòng
+let botCount=1, tempoKey="mid";
+const myId=(()=>{ try{ let x=sessionStorage.getItem("tm-id"); if(!x){ x=Math.random().toString(36).slice(2); sessionStorage.setItem("tm-id",x); } return x; }catch(e){ return Math.random().toString(36).slice(2); } })();
+
+const $ = id => document.getElementById(id);
+function toast(t){ const el=$("toast"); el.textContent=t; el.classList.add("show"); clearTimeout(el._t); el._t=setTimeout(()=>el.classList.remove("show"),2600); }
+function lobbyMsg(t){ $("lobbyMsg").textContent=t||""; }
+function genCode(){ const A="ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; let s=""; const r=new Uint32Array(5); crypto.getRandomValues(r); for(const x of r) s+=A[x%A.length]; return s; }
+function roomLink(){ return location.origin+location.pathname+"?room="+roomCode; }
+function getName(){
+  const n=$("nameInput").value.trim();
+  if(!n){ lobbyMsg("Nhập tên trước đã nhé 🧘"); $("nameInput").focus(); return null; }
+  try{ localStorage.setItem("themind-name",n); }catch(e){}
+  return n;
+}
+function lockLobby(b){ $("createBtn").disabled=b; $("joinBtn").disabled=b; $("botBtn").disabled=b; }
+
+function playBot(){
+  const n=getName(); if(!n) return;
+  myName=n; isHost=true; roomCode="";
+  seats=[{name:n,bot:false}, ...range(botCount).map(i=>({name:BOTNAMES[i],bot:true}))];
+  startMatch();
+}
+function startMatch(){
+  state=newGame(seats.map(s=>s.name), seats.map(s=>s.bot), TEMPOS[tempoKey]);
+  startGameUI(); broadcast();
+}
+function createRoom(){
+  const n=getName(); if(!n) return;
+  if(typeof Peer==="undefined"){ lobbyMsg("Không tải được thư viện kết nối, kiểm tra mạng."); return; }
+  myName=n; isHost=true; lockLobby(true); lobbyMsg("");
+  seats=[{name:n,bot:false}];
+  roomCode=genCode();
+  peer=new Peer(PREFIX+roomCode);
+  peer.on("open",()=>{
+    $("lobbyMain").classList.add("hidden"); $("lobbyWait").classList.remove("hidden");
+    $("waitCode").textContent=roomCode; $("waitLink").textContent=roomLink();
+    history.replaceState(null,"","?room="+roomCode+"&host=1");
+    sendLobby();
+  });
+  peer.on("connection", onGuestConn);
+  peer.on("disconnected",()=>{ if(!peer.destroyed) peer.reconnect(); });
+  peer.on("error",e=>{
+    if(e.type==="unavailable-id"){ peer.destroy(); isHost=false; createRoom(); return; }
+    if(e.type==="peer-unavailable") return;
+    console.warn(e); toast("Lỗi kết nối: "+e.type); lockLobby(false);
+  });
+}
+function onGuestConn(c){
+  c.on("data", msg=>{
+    if(!msg||typeof msg!=="object") return;
+    if(msg.t==="hello"){
+      const name=String(msg.name||"Khách").slice(0,16), id=String(msg.id||"");
+      let i=seats.findIndex(s=>!s.bot&&s.id&&s.id===id);
+      if(!state){
+        if(i<0){
+          if(seats.length>=MAXP){ c.send({t:"full",msg:"Phòng đã đủ 4 người."}); setTimeout(()=>c.close(),300); return; }
+          seats.push({name,id,bot:false,conn:c});
+        } else { seats[i].conn=c; seats[i].name=name; }
+        sendLobby();
+      } else {
+        if(i<0){ c.send({t:"full",msg:"Ván đã bắt đầu, không vào thêm được."}); setTimeout(()=>c.close(),300); return; }
+        seats[i].conn=c; state.log.push({t:`${state.names[i]} đã vào lại phòng.`});
+        broadcast();
+      }
+    } else if(msg.t==="act" && state){
+      const i=seats.findIndex(s=>s.conn===c); if(i<1) return;
+      const err=applyAction(state,i,msg.a||{});
+      if(err) c.send({t:"err",msg:err});
+      broadcast();
+    }
+  });
+  c.on("close",()=>{
+    const i=seats.findIndex(s=>s.conn&&s.conn===c); if(i<1) return;
+    if(!state){ seats.splice(i,1); sendLobby(); }
+    else { seats[i].conn=null; state.log.push({t:`${state.names[i]} mất kết nối…`}); broadcast(); }
+  });
+}
+function lobbyList(){ return seats.map(s=>({name:s.name,bot:!!s.bot})); }
+function sendLobby(){
+  renderSeats(lobbyList(), true);
+  seats.forEach((s,i)=>{ if(i>0&&s.conn&&s.conn.open) s.conn.send({t:"lobby",seats:lobbyList(),you:i}); });
+}
+function renderSeats(list, host, you=0){
+  $("seatList").innerHTML = range(MAXP).map(i=>{
+    const s=list[i];
+    if(!s) return `<div class="seat empty">Ghế trống</div>`;
+    return `<div class="seat"><span class="pdot" style="--pc:${PCOL[i]}"></span>${esc(s.name)}${s.bot?" 🤖":""}${i===0?" <span class='tagm'>(chủ phòng)</span>":""}${i===you?" <span class='tagm'>(bạn)</span>":""}
+      ${host&&s.bot?`<button class="x" data-rm="${i}" title="Bỏ máy">✕</button>`:""}</div>`;
+  }).join("");
+  if(host){
+    $("addBotBtn").disabled=list.length>=MAXP;
+    $("startBtn").disabled=list.length<2;
+    $("waitNote").innerHTML = list.length<2 ? `Đang chờ người chơi<span class="dots"></span>` : `Đủ người rồi — bấm <b>Bắt đầu</b> khi sẵn sàng.`;
+  }
+}
+function broadcast(){
+  onView(viewFor(state,0));
+  seats.forEach((s,i)=>{ if(i>0&&s.conn&&s.conn.open) s.conn.send({t:"state", view:Object.assign(viewFor(state,i),{offline:offline()})}); });
+  planBots();
+}
+function offline(){ return seats.map((s,i)=>i>0&&!s.bot&&!(s.conn&&s.conn.open)); }
+function joinRoom(){
+  const n=getName(); if(!n) return;
+  const code=$("codeInput").value.trim().toUpperCase();
+  if(code.length!==5){ lobbyMsg("Mã phòng gồm 5 ký tự."); return; }
+  if(typeof Peer==="undefined"){ lobbyMsg("Không tải được thư viện kết nối, kiểm tra mạng."); return; }
+  myName=n; roomCode=code; isHost=false; lockLobby(true); lobbyMsg("Đang kết nối…");
+  $("lobbyMsg").style.color="var(--muted)";
+  if(peer) peer.destroy();
+  peer=new Peer();
+  peer.on("open",()=>connectToHost());
+  peer.on("error",e=>{
+    $("lobbyMsg").style.color="";
+    if(e.type==="peer-unavailable"){ clearTimeout(joinTimer); if(!view){ lobbyMsg("Không tìm thấy phòng "+roomCode+". Kiểm tra lại mã."); lockLobby(false); showLobbyMain(); } else showDisconnected(); }
+    else { console.warn(e); lobbyMsg("Lỗi kết nối: "+e.type); lockLobby(false); }
+  });
+  peer.on("disconnected",()=>{ if(!peer.destroyed) peer.reconnect(); });
+}
+function showLobbyMain(){ $("lobbyWait").classList.add("hidden"); $("lobbyMain").classList.remove("hidden"); }
+function connectToHost(){
+  conn=peer.connect(PREFIX+roomCode,{reliable:true});
+  clearTimeout(joinTimer);
+  joinTimer=setTimeout(()=>{ if(!view&&$("lobbyWait").classList.contains("hidden")){ lobbyMsg("Kết nối quá lâu. Chủ phòng còn mở tab không?"); lockLobby(false); } },15000);
+  conn.on("open",()=>{ conn.send({t:"hello",name:myName,id:myId}); });
+  conn.on("data",msg=>{
+    if(!msg) return;
+    if(msg.t==="lobby"){
+      clearTimeout(joinTimer); lobbyMsg("");
+      $("lobbyMain").classList.add("hidden"); $("lobbyWait").classList.remove("hidden");
+      $("waitTitle").textContent="Đã vào phòng!"; $("waitTag").textContent="Mã phòng";
+      $("waitCode").textContent=roomCode; $("waitLink").classList.add("hidden"); $("copyRow").classList.add("hidden");
+      $("hostCtl").classList.add("hidden");
+      $("waitNote").innerHTML=`Chờ chủ phòng bắt đầu<span class="dots"></span>`;
+      renderSeats(msg.seats,false,msg.you);
+      history.replaceState(null,"","?room="+roomCode);
+    }
+    else if(msg.t==="state"){ clearTimeout(joinTimer); lobbyMsg(""); if($("game").classList.contains("hidden")) startGameUI(); if(overlayId==="dc") closeOverlay(); onView(msg.view); }
+    else if(msg.t==="err") toast(msg.msg);
+    else if(msg.t==="full"){ lobbyMsg(msg.msg||"Phòng đã đủ người."); lockLobby(false); showLobbyMain(); }
+  });
+  conn.on("close",()=>{
+    if(view) showDisconnected();
+    else if(!$("lobbyWait").classList.contains("hidden")){ showLobbyMain(); lockLobby(false); lobbyMsg("Mất kết nối với chủ phòng."); }
+  });
+}
+function showDisconnected(){
+  openOverlay(`<h2>Mất kết nối</h2><p class="tag" style="text-align:center">Không liên lạc được với chủ phòng.</p>
+    <div class="row"><button class="btn green" id="rejoinBtn">Kết nối lại</button></div>`, "dc");
+  $("rejoinBtn").onclick=()=>{ $("rejoinBtn").disabled=true; $("rejoinBtn").textContent="Đang thử…"; connectToHost(); };
+}
+function sendAction(a){
+  if(isHost){ const err=applyAction(state,0,a); if(err) toast(err); broadcast(); }
+  else if(conn && conn.open) conn.send({t:"act",a});
+  else toast("Chưa kết nối với chủ phòng.");
+}
+
+/* ================= SOUND ================= */
+let actx=null, soundOn=true, musicOn=false, music=null;
+try{ soundOn=localStorage.getItem("themind-snd")!=="0"; }catch(e){}
+function ac(){
+  if(!actx){ try{ actx=new (window.AudioContext||window.webkitAudioContext)(); }catch(e){ return null; } }
+  if(actx.state==="suspended") actx.resume();
+  return actx;
+}
+document.addEventListener("pointerdown",()=>{ if(soundOn||musicOn) ac(); });
+function tone(f,t0,dur,type="sine",vol=.15,f2,dest){
+  const a=ac(); if(!a) return;
+  const o=a.createOscillator(), g=a.createGain(), t=a.currentTime+t0;
+  o.type=type; o.frequency.setValueAtTime(f,t); if(f2) o.frequency.exponentialRampToValueAtTime(f2,t+dur);
+  g.gain.setValueAtTime(.0001,t); g.gain.linearRampToValueAtTime(vol,t+.012); g.gain.exponentialRampToValueAtTime(.0001,t+dur);
+  o.connect(g).connect(dest||a.destination); o.start(t); o.stop(t+dur+.05);
+}
+function noise(t0,dur,freq,vol,f2){
+  const a=ac(); if(!a) return;
+  const t=a.currentTime+t0, buf=a.createBuffer(1,Math.ceil(a.sampleRate*dur),a.sampleRate), d=buf.getChannelData(0);
+  for(let j=0;j<d.length;j++) d[j]=(Math.random()*2-1)*(1-j/d.length);
+  const s=a.createBufferSource(), f=a.createBiquadFilter(), g=a.createGain();
+  f.type="bandpass"; f.frequency.setValueAtTime(freq,t); if(f2) f.frequency.exponentialRampToValueAtTime(f2,t+dur); f.Q.value=1.4; g.gain.value=vol;
+  s.buffer=buf; s.connect(f).connect(g).connect(a.destination); s.start(t);
+}
+function sfx(kind, c){
+  if(!soundOn) return; const a=ac(); if(!a||a.state!=="running") return;
+  if(kind==="card"){                                  // lá càng lớn âm càng cao
+    noise(0,.06,900,.35);
+    const f=196*Math.pow(2,(c||50)/40);
+    tone(f,0,.35,"triangle",.11); tone(f*2,.01,.2,"sine",.04);
+  }
+  else if(kind==="mistake"){ tone(155,0,.7,"sawtooth",.07,90); tone(164,0,.7,"sawtooth",.07,96); noise(0,.25,300,.5); }
+  else if(kind==="level"){ [523,659,784,988,1319].forEach((f,i)=>tone(f,i*.09,.6,"sine",.11)); }
+  else if(kind==="start"){ tone(392,0,1.6,"sine",.14); tone(588,0,1.2,"sine",.05); tone(784,.02,.9,"sine",.04); }
+  else if(kind==="ready"){ tone(880,0,.25,"sine",.07); }
+  else if(kind==="pause"){ tone(523,0,.18,"triangle",.1); tone(392,.12,.25,"triangle",.09); }
+  else if(kind==="propose"){ tone(660,0,.15,"triangle",.1); tone(880,.1,.2,"triangle",.1); }
+  else if(kind==="star"){ noise(0,.45,4000,.6,500); [1319,1568,1976].forEach((f,i)=>tone(f,.25+i*.07,.4,"sine",.06)); }
+  else if(kind==="win"){ [523,659,784,1047,784,1047,1319].forEach((f,i)=>tone(f,i*.13,.5,"triangle",.1)); }
+  else if(kind==="lose"){ [392,349,311,262].forEach((f,i)=>tone(f,i*.22,.55,"triangle",.1)); }
+}
+function startMusic(){
+  const a=ac(); if(!a||music) return;
+  const g=a.createGain(); g.gain.value=.0001; g.connect(a.destination);
+  g.gain.exponentialRampToValueAtTime(.06,a.currentTime+3);
+  const oscs=[[110,.5],[164.8,.3],[220.7,.22],[329.6,.1]].map(([f,v],i)=>{
+    const o=a.createOscillator(), og=a.createGain(), l=a.createOscillator(), lg=a.createGain();
+    o.type="sine"; o.frequency.value=f; og.gain.value=v;
+    l.frequency.value=.05+i*.031; lg.gain.value=v*.6; l.connect(lg).connect(og.gain);
+    o.connect(og).connect(g); o.start(); l.start();
+    return [o,l];
+  });
+  const notes=[440,493.9,554.4,659.3,740,880,987.8,1108.7];
+  const tick=setInterval(()=>{ if(Math.random()<.6) tone(notes[rnd(notes.length)],0,3.2,"sine",.35,null,g); }, 2300);
+  music={g,oscs,tick};
+}
+function stopMusic(){
+  if(!music) return; const a=actx, m=music; music=null;
+  clearInterval(m.tick);
+  m.g.gain.cancelScheduledValues(a.currentTime); m.g.gain.setValueAtTime(Math.max(.0001,m.g.gain.value),a.currentTime);
+  m.g.gain.exponentialRampToValueAtTime(.0001,a.currentTime+1.2);
+  setTimeout(()=>m.oscs.forEach(([o,l])=>{ o.stop(); l.stop(); }),1400);
+}
+
+/* ================= UI ================= */
+let overlayId=null, endTimer=null;
+function openOverlay(html,id){ $("modal").innerHTML=html; $("overlay").classList.remove("hidden"); overlayId=id; }
+function closeOverlay(){ $("overlay").classList.add("hidden"); overlayId=null; }
+$("overlay").addEventListener("click",e=>{ if(e.target.id==="overlay" && overlayId==="rules") closeOverlay(); });
+
+function startGameUI(){
+  $("lobby").classList.add("hidden"); $("game").classList.remove("hidden");
+  $("roomInfo").innerHTML = roomCode ? `Phòng <b>${roomCode}</b>` : "Chơi với máy";
+  if(!isHost && roomCode) history.replaceState(null,"","?room="+roomCode);
+}
+const esc = s => String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const hue = c => Math.round(200+(c-1)*1.55);              // xanh dương (1) → hồng đỏ (100)
+const cardHTML = (c, cls="", style="", title="") => `<div class="card ${cls}" style="--h:${hue(c)};${style}" data-c="${c}"${title?` title="${esc(title)}"`:""}><span class="k">${c}</span>${c}<span class="k b">${c}</span></div>`;
+const SHU = (cls="") => `<svg class="shu ${cls}" viewBox="0 0 24 24"><path d="M12 1 14.6 9.4 23 12 14.6 14.6 12 23 9.4 14.6 1 12 9.4 9.4Z" fill="currentColor"/><circle cx="12" cy="12" r="2.3" fill="#0d1030"/></svg>`;
+const readyN = v => v.ready.filter(Boolean).length;
+const myHand = () => view.hands[view.me] || [];
+
+function fx(kind){
+  const el=$("fx"); el.className=""; void el.offsetWidth; el.className=kind;
+  if(kind==="red"){ const t=$("table"); t.classList.remove("shake"); void t.offsetWidth; t.classList.add("shake"); }
+}
+
+function onView(v){
+  const prev=view; view=v;
+  if(prev && prev.games===v.games){
+    if(v.stats.played>prev.stats.played && v.lastPlay) sfx("card", v.lastPlay.c);
+    const L=v.last;
+    if(L && (!prev.last || L.id!==prev.last.id)){
+      if(L.kind==="mistake" || L.mistake){ setTimeout(()=>sfx("mistake"),120); fx("red"); }
+      if(L.kind==="level"){ setTimeout(()=>sfx("level"), L.mistake?700:200); setTimeout(()=>fx("gold"), L.mistake?600:0); }
+      else if(L.kind==="win"){ setTimeout(()=>sfx("win"),300); fx("gold"); }
+      else if(L.kind==="lose") setTimeout(()=>sfx("lose"),500);
+      else if(L.kind==="star") sfx("star");
+      else if(L.kind==="start") sfx("start");
+      else if(L.kind==="propose") sfx("propose");
+      else if(L.kind==="pause"||L.kind==="nostar") sfx("pause");
+    }
+    if(v.phase==="focus" && prev.phase==="focus" && readyN(v)>readyN(prev)) sfx("ready");
+  }
+  render(prev);
+  clearTimeout(endTimer);
+  if(v.phase==="end"){ if(overlayId!=="end" && overlayId!=="rules") endTimer=setTimeout(()=>{ if(view.phase==="end"&&!overlayId) showEnd(); }, prev&&prev.phase!=="end"?1600:0); }
+  else if(overlayId==="end") closeOverlay();
+  const need = (v.phase==="focus"&&!v.ready[v.me]) || (v.phase==="vote"&&v.vote.yes[v.me]===null);
+  document.title = need ? "● Đến bạn · The Mind" : "The Mind";
+}
+
+function render(prev){
+  const v=view;
+  $("lvlChip").innerHTML=`Cấp <b>${v.level}</b>/${v.maxLevel}`;
+  $("livesChip").innerHTML=range(Math.max(v.lives,v.n,1)).map(i=>`<span class="hrt ${i<v.lives?"":"e"}">❤</span>`).join("");
+  $("starsChip").innerHTML=v.stars ? range(v.stars).map(()=>SHU()).join("") : SHU("e");
+  $("table").classList.toggle("playing", v.phase==="play");
+  renderMates();
+  renderTable(prev);
+  renderHand(prev);
+  renderActions();
+  renderSide();
+  $("log").innerHTML = v.log.slice().reverse().map(l=>`<div class="${l.sys?"sys":""}">${esc(l.t)}</div>`).join("");
+}
+
+function renderMates(){
+  const v=view, off=v.offline||(isHost?offline():[]);
+  const recent = v.lastPlay && v.last && v.last.kind==="play" ? v.lastPlay.p : -1;
+  $("mates").innerHTML = range(v.n).filter(p=>p!==v.me).map(p=>{
+    const n=v.counts[p];
+    let st="";
+    if(v.phase==="focus") st = v.ready[p] ? `<span class="st ok">✋ Sẵn sàng</span>` : `<span class="st">đang xem bài<span class="dots"></span></span>`;
+    else if(v.phase==="vote") st = v.vote.yes[p]===true ? `<span class="st ok">👍 Đồng ý</span>` : v.vote.yes[p]===false ? `<span class="st no">👎</span>` : `<span class="st">🤔 đang nghĩ</span>`;
+    else if(v.phase==="play" && !n) st = `<span class="st">hết bài</span>`;
+    const left = v.phase==="end" && v.hands[p] && v.hands[p].length ? `<div class="revealed">${v.hands[p].map(c=>cardHTML(c)).join("")}</div>` : "";
+    return `<div class="mate ${p===recent?"just":""}" style="--pc:${PCOL[p]}">
+      <div class="mh"><span class="pdot"></span><span class="nm">${esc(v.names[p])}</span>${v.bots[p]?"🤖":""}${off[p]?` <span class="off">mất kết nối</span>`:""}</div>
+      <div class="mrow"><span class="backs">${range(v.phase==="end"?0:Math.min(n,12)).map(()=>`<i class="cb"></i>`).join("")}</span><span class="mcount">${n} lá</span>${st}</div>${left}
+    </div>`;
+  }).join("");
+}
+
+function renderTable(prev){
+  const v=view, L=v.last;
+  let h="";
+  const showNote = L && !(v.phase==="play" && L.kind==="start");
+  if(showNote) h+=`<div class="note ${L.kind}">${esc(L.t)}</div>`;
+  if(v.phase==="focus") h+=`<div class="bn">🧘 <b>Tập trung</b> · cấp ${v.level}: mỗi người ${v.level} lá · <b>${readyN(v)}/${v.n}</b> sẵn sàng</div>`;
+  else if(v.phase==="play") h+=`<div class="bn">🤫 <b>Không nói chuyện.</b> Đánh lá thấp nhất khi bạn cảm thấy đã đến lúc.</div>`;
+  else if(v.phase==="vote"){
+    const yn=v.vote.yes.filter(x=>x).length;
+    h+=`<div class="bn">${SHU()} <b>${esc(v.names[v.vote.by])}</b> đề nghị dùng phi tiêu: nếu cả đội đồng ý, mỗi người bỏ lá thấp nhất · <b>${yn}/${v.n}</b> đồng ý</div>`;
+  }
+  $("banner").innerHTML=h;
+
+  // chồng bài giữa bàn
+  const total=v.n*v.level, played=v.pile.length, left=v.counts.reduce((s,x)=>s+x,0);
+  let p="";
+  const newCard = prev && prev.games===v.games && v.stats.played>prev.stats.played;
+  if(v.pile.length){
+    const shown=v.pile.slice(-5);
+    p=shown.map((x,i)=>{
+      const top=i===shown.length-1, r=(((x.c*37)%15)-7)*1.6;
+      return cardHTML(x.c, `${top?"":"old"} ${top&&newCard?"enter":""}`, `--r:${top?0:r}deg;z-index:${i}`);
+    }).join("");
+  } else if(v.prevPile && v.phase==="focus"){
+    p=v.prevPile.cards.map((x,i,a)=>cardHTML(x.c, i===a.length-1?"":"old", `--r:${i===a.length-1?0:(((x.c*37)%15)-7)*1.6}deg;z-index:${i}`))
+      + `<span class="badge">✓ Cấp ${v.prevPile.level}</span>`;
+  } else p=`<div class="slot">Lá đầu tiên<br>sẽ nằm ở đây</div>`;
+  const pile=$("pile");
+  pile.className = "pile" + (!v.pile.length&&v.prevPile&&v.phase==="focus" ? " ghost" : "");
+  pile.innerHTML=p;
+
+  $("sideL").innerHTML = `<span class="lbl">Đã đánh</span><span class="big">${played}<span class="muted" style="font-size:.6em">/${total}</span></span>
+    <span class="prog"><i style="width:${total?(total-left)/total*100:0}%"></i></span>
+    <span class="small muted">Còn ${left} lá trên tay cả đội</span>`;
+  const dis=v.discards;
+  $("sideR").innerHTML = `<span class="lbl">Bị loại</span>` + (dis.length
+    ? `<div class="discards">${dis.map(x=>cardHTML(x.c,`dc ${x.why}`,"",v.names[x.p]+(x.why==="x"?" — bị loại do đánh sai":" — bỏ bằng phi tiêu"))).join("")}</div>`
+    : `<span class="small muted">Chưa có</span>`);
+}
+
+function renderHand(prev){
+  const v=view, h=myHand();
+  const dealt = !prev || prev.level!==v.level || prev.games!==v.games;
+  $("handSub").textContent = h.length ? `· ${h.length} lá` : "";
+  if(!h.length){
+    $("hand").innerHTML = `<div class="empty">${v.phase==="end"?"—":"Bạn đã hết bài 🙌 Ngồi im và chờ đồng đội…"}</div>`;
+    return;
+  }
+  $("hand").innerHTML = h.map((c,i)=>cardHTML(c, `${i===0&&v.phase==="play"?"next":""} ${dealt?"deal":""}`, `--i:${i}`)).join("");
+  const nx=$("hand").querySelector(".card.next");
+  if(nx) nx.onclick=()=>sendAction({k:"play",c:+nx.dataset.c});
+}
+
+function renderActions(){
+  const v=view, h=myHand(), me=v.me;
+  let a="", hint="";
+  if(v.phase==="focus"){
+    if(!v.ready[me]){ a=`<button class="btn green big" id="readyBtn">✋ Sẵn sàng <kbd>Enter</kbd></button>`; hint="Xem bài của bạn, hít thở, rồi bấm Sẵn sàng. Khi cả đội sẵn sàng, ván bắt đầu."; }
+    else {
+      const wait=range(v.n).filter(p=>!v.ready[p]).map(p=>esc(v.names[p]));
+      a=`<div class="wait">Đã sẵn sàng · chờ ${wait.join(", ")}<span class="dots"></span></div>`;
+    }
+  } else if(v.phase==="play"){
+    a = (h.length ? `<button class="btn big" id="playBtn">Đánh lá ${h[0]} <kbd>Space</kbd></button>` : "")
+      + `<button class="btn gold" id="starBtn" ${v.stars?"":"disabled"}>${SHU()} Phi tiêu (${v.stars})</button>`
+      + `<button class="btn ghost" id="pauseBtn">✋ Dừng lại</button>`;
+    hint = h.length ? "Đếm thầm từ lá trên cùng tới lá của bạn. Không có lượt — ai thấy đến lúc thì đánh." : "";
+  } else if(v.phase==="vote"){
+    if(v.vote.yes[me]===null) a=`<button class="btn green big" id="yesBtn">👍 Đồng ý <kbd>Y</kbd></button><button class="btn red" id="noBtn">👎 Không <kbd>N</kbd></button>`;
+    else a=`<div class="wait">Đã đồng ý · chờ cả đội biểu quyết<span class="dots"></span></div>`;
+  } else if(v.phase==="end"){
+    a=`<button class="btn green big" id="againBtn2">Chơi lại từ cấp 1</button><button class="btn ghost" id="resBtn">Xem kết quả</button>`;
+  }
+  $("actions").innerHTML=a; $("hint").textContent=hint;
+  const on=(id,f)=>{ const b=$(id); if(b) b.onclick=f; };
+  on("readyBtn",()=>sendAction({k:"ready"}));
+  on("playBtn",()=>{ const x=myHand(); if(x.length) sendAction({k:"play",c:x[0]}); });
+  on("starBtn",()=>sendAction({k:"star"}));
+  on("pauseBtn",()=>sendAction({k:"pause"}));
+  on("yesBtn",()=>sendAction({k:"vote",y:true}));
+  on("noBtn",()=>sendAction({k:"vote",y:false}));
+  on("againBtn2",()=>sendAction({k:"rematch"}));
+  on("resBtn",showEnd);
+}
+
+function renderSide(){
+  const v=view;
+  $("lvSub").textContent = `${v.n} người · ${v.maxLevel} cấp`;
+  $("track").innerHTML = range(v.maxLevel).map(i=>{
+    const L=i+1, done=L<v.level||(v.phase==="end"&&v.won), cur=L===v.level&&!(v.phase==="end"&&v.won);
+    const rw = L<v.maxLevel && REWARD[L] ? `<span class="rw">${REWARD[L]==="life"?"❤️":SHU()}</span>` : "";
+    return `<div class="lv ${done?"done":""} ${cur?"cur":""}" title="Cấp ${L}: mỗi người ${L} lá${REWARD[L]&&L<v.maxLevel?` — xong được thưởng ${REWARD[L]==="life"?"1 mạng":"1 phi tiêu"}`:""}">${L}${rw}</div>`;
+  }).join("");
+  let s=`<div class="stat">❤ Mạng <span class="sp"></span><span><b>${v.lives}</b>/${MAXLIVES}</span></div>
+    <div class="stat">${SHU()} Phi tiêu <span class="sp"></span><span><b>${v.stars}</b>/${MAXSTARS}</span></div>
+    <div class="stat">💥 Lần đánh sai <span class="sp"></span><b>${v.stats.mistakes}</b></div>`;
+  if(v.bots.some(Boolean)) s+=`<div class="tempo">🤖 Máy đếm khoảng <b>${(1/v.tempo).toFixed(1)} số/giây</b> từ lá trên cùng, và tự điều chỉnh theo nhịp của bạn.</div>`;
+  $("stats").innerHTML=s;
+}
+
+document.addEventListener("keydown",e=>{
+  if(!view||overlayId||e.target.tagName==="INPUT"||e.repeat) return;
+  const v=view, h=myHand();
+  if(e.key===" " && v.phase==="play"){ e.preventDefault(); if(h.length) sendAction({k:"play",c:h[0]}); }
+  else if(e.key==="Enter" && v.phase==="focus" && !v.ready[v.me]){ e.preventDefault(); sendAction({k:"ready"}); }
+  else if(v.phase==="vote" && v.vote.yes[v.me]===null && /^[yn]$/i.test(e.key)) sendAction({k:"vote",y:/y/i.test(e.key)});
+});
+
+function fmtTime(ms){ const s=Math.round(ms/1000); return `${Math.floor(s/60)} phút ${s%60} giây`; }
+function showEnd(){
+  const v=view;
+  const passed = v.won ? v.maxLevel : v.level-1;
+  const title = v.won ? "🏆 Tâm trí hợp nhất!" : "💔 Hết mạng rồi";
+  const sub = v.won ? `Cả đội đã vượt qua tất cả ${v.maxLevel} cấp.` : `Dừng lại ở cấp ${v.level} — đã vượt qua ${passed}/${v.maxLevel} cấp.`;
+  const left = v.won ? "" : range(v.n).filter(p=>v.hands[p]&&v.hands[p].length).map(p=>
+    `<div class="lrow"><span class="pdot" style="--pc:${PCOL[p]}"></span><b>${esc(v.names[p])}</b>${v.hands[p].map(c=>cardHTML(c)).join("")}</div>`).join("");
+  openOverlay(`
+    <h2>${title}</h2>
+    <p class="tag" style="text-align:center;margin:0">${sub}</p>
+    <table>
+      <tr><td>Số cấp vượt qua</td><td><b>${passed}</b> / ${v.maxLevel}</td></tr>
+      <tr><td>Lá đã đánh</td><td><b>${v.stats.played}</b></td></tr>
+      <tr><td>Lần đánh sai</td><td><b>${v.stats.mistakes}</b></td></tr>
+      <tr><td>Phi tiêu đã dùng</td><td><b>${v.stats.stars}</b></td></tr>
+      <tr><td>Thời gian</td><td><b>${fmtTime(v.stats.end-v.stats.start)}</b></td></tr>
+    </table>
+    ${left?`<div class="left"><div class="tagm">Bài còn trên tay:</div>${left}</div>`:""}
+    <div class="row">
+      <button class="btn green" id="againBtn">Chơi lại từ cấp 1</button>
+      <button class="btn ghost" id="viewBoardBtn">Xem bàn</button>
+    </div>`, "end");
+  $("againBtn").onclick=()=>sendAction({k:"rematch"});
+  $("viewBoardBtn").onclick=closeOverlay;
+}
+
+function showRules(){
+  openOverlay(`<h2>Luật chơi The Mind</h2><div class="rules">
+    <p>Trò chơi hợp tác của Wolfgang Warsch (2018). Cả đội cùng thắng hoặc cùng thua. Bộ bài gồm các lá <b>1–100</b>.</p>
+    <h3>Mục tiêu</h3>
+    <ul>
+      <li>Ở <b>cấp N</b>, mỗi người được chia <b>N lá</b>. Cả đội phải đánh hết bài lên giữa bàn thành <b>một chồng tăng dần</b>.</li>
+      <li>Vượt qua cấp cuối là thắng: 2 người <b>12 cấp</b>, 3 người <b>10 cấp</b>, 4 người <b>8 cấp</b>.</li>
+    </ul>
+    <h3>Không lời</h3>
+    <ul>
+      <li><b>Không có lượt.</b> Ai thấy đến lúc thì đánh lá thấp nhất của mình.</li>
+      <li>Không được nói, ra hiệu hay gợi ý số bài. Chỉ có cảm nhận về thời gian: đếm thầm từ lá trên cùng tới lá của bạn.</li>
+      <li>Đầu mỗi cấp, cả đội <b>tập trung</b>: ai cũng bấm <i>Sẵn sàng</i> thì mới bắt đầu. Bất kỳ ai cũng có thể bấm <i>Dừng lại</i> để cả đội tập trung lại.</li>
+    </ul>
+    <h3>Mạng & đánh sai</h3>
+    <ul>
+      <li>Đội có số mạng bằng số người (tối đa 5).</li>
+      <li>Nếu ai đó đánh một lá mà người khác vẫn còn lá <b>nhỏ hơn</b>: mất <b>1 mạng</b>, mọi lá nhỏ hơn bị loại khỏi tay, rồi cả đội tập trung lại và chơi tiếp cấp đó.</li>
+      <li>Hết mạng là thua.</li>
+    </ul>
+    <h3>Phi tiêu</h3>
+    <ul>
+      <li>Bắt đầu với 1 phi tiêu (tối đa 3). Một người đề nghị dùng; nếu <b>cả đội đồng ý</b>, mỗi người bỏ lá thấp nhất của mình (lật ngửa cho mọi người thấy).</li>
+      <li>Đây là cách duy nhất để "trao đổi thông tin": nhìn các lá bị bỏ, bạn đoán được bài của đồng đội.</li>
+    </ul>
+    <h3>Phần thưởng</h3>
+    <ul><li>Xong cấp <b>2, 5, 8</b>: +1 phi tiêu · xong cấp <b>3, 6, 9</b>: +1 mạng.</li></ul>
+    <h3>Chơi với máy</h3>
+    <ul>
+      <li>Máy đếm thầm với nhịp hiển thị ở khung Tiến trình, và tự điều chỉnh nhịp theo cách bạn đánh.</li>
+      <li>Máy luôn đồng ý khi bạn đề nghị dùng phi tiêu.</li>
+      <li>Phím tắt: <b>Space</b> đánh lá thấp nhất · <b>Enter</b> sẵn sàng · <b>Y/N</b> biểu quyết.</li>
+    </ul>
+    </div><div class="row"><button class="btn green" id="closeRules">Đã hiểu</button></div>`, "rules");
+  $("closeRules").onclick=closeOverlay;
+}
+
+/* ================= BOOT ================= */
+$("logoCards").innerHTML=[7,42,93].map(c=>cardHTML(c)).join("");
+$("createBtn").onclick=createRoom;
+$("joinBtn").onclick=joinRoom;
+$("botBtn").onclick=playBot;
+$("rulesBtn0").onclick=showRules;
+$("rulesBtn").onclick=()=>{ const prev=overlayId; showRules(); if(prev==="end") $("closeRules").onclick=showEnd; };
+$("copyBtn").onclick=()=>{ navigator.clipboard.writeText(roomLink()).then(()=>toast("Đã sao chép link!"),()=>toast("Không sao chép được, hãy copy thủ công.")); };
+$("codeInput").addEventListener("keydown",e=>{ if(e.key==="Enter") joinRoom(); });
+$("nameInput").addEventListener("keydown",e=>{ if(e.key==="Enter") playBot(); });
+$("botSeg").querySelectorAll("button").forEach(b=>b.onclick=()=>{
+  botCount=+b.dataset.n; $("botSeg").querySelectorAll("button").forEach(x=>x.classList.toggle("on",x===b));
+});
+$("tempoSeg").querySelectorAll("button").forEach(b=>b.onclick=()=>{
+  tempoKey=b.dataset.t; $("tempoSeg").querySelectorAll("button").forEach(x=>x.classList.toggle("on",x===b));
+  try{ localStorage.setItem("themind-tempo",tempoKey); }catch(e){}
+});
+try{ const t=localStorage.getItem("themind-tempo"); if(TEMPOS[t]){ tempoKey=t; $("tempoSeg").querySelectorAll("button").forEach(x=>x.classList.toggle("on",x.dataset.t===t)); } }catch(e){}
+$("addBotBtn").onclick=()=>{
+  if(seats.length>=MAXP) return;
+  const used=new Set(seats.map(s=>s.name));
+  seats.push({name:BOTNAMES.find(n=>!used.has(n))||"Máy", bot:true}); sendLobby();
+};
+$("seatList").addEventListener("click",e=>{
+  const i=e.target.dataset&&e.target.dataset.rm; if(!isHost||i===undefined) return;
+  seats.splice(+i,1); sendLobby();
+});
+$("startBtn").onclick=()=>{ if(seats.length>=2) startMatch(); };
+$("sndBtn").onclick=()=>{
+  soundOn=!soundOn; $("sndBtn").textContent=soundOn?"🔔":"🔕";
+  try{ localStorage.setItem("themind-snd",soundOn?"1":"0"); }catch(e){}
+  if(soundOn){ ac(); sfx("ready"); }
+};
+$("sndBtn").textContent=soundOn?"🔔":"🔕";
+$("musicBtn").onclick=()=>{
+  musicOn=!musicOn; $("musicBtn").style.opacity=musicOn?1:.55;
+  if(musicOn) startMusic(); else stopMusic();
+};
+$("musicBtn").style.opacity=.55;
+try{ const n=localStorage.getItem("themind-name"); if(n) $("nameInput").value=n; }catch(e){}
+const qs=new URLSearchParams(location.search);
+if(qs.get("room") && !qs.get("host")) $("codeInput").value=qs.get("room").toUpperCase();
+</script>
+</body>
+</html>
