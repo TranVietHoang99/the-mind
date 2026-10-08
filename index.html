@@ -85,6 +85,9 @@ input:focus{border-color:var(--accent)}
   font-family:"Unbounded",sans-serif;font-size:2.3rem;font-weight:800;letter-spacing:8px;color:#d6ceff;
   background:rgba(143,125,255,.12);border:2px dashed var(--accent);border-radius:18px;padding:8px 10px;margin:10px 0;
 }
+.net{font-weight:700;font-size:.9rem}
+.net.ok{color:#7ff0c3}
+.net.bad{color:var(--gold)}
 .waiting .link{font-size:.85rem;word-break:break-all;color:var(--muted);margin:8px 0}
 .seats{display:flex;flex-direction:column;gap:6px;margin-top:14px;text-align:left}
 .seat{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:12px;background:var(--panel2);font-weight:700}
@@ -299,8 +302,9 @@ header .sp{flex:1}
     </div>
     <div id="lobbyWait" class="waiting hidden">
       <h2 style="margin:6px 0 0" id="waitTitle">Phòng đã tạo!</h2>
-      <p class="tag" id="waitTag">Gửi mã này cho bạn bè (tối đa 4 người)</p>
+      <p class="tag" id="waitTag">Gửi mã này cho bạn bè (tối đa 4 người). Gửi xong nhớ quay lại tab này.</p>
       <div class="code" id="waitCode">-----</div>
+      <div class="net" id="netStatus"></div>
       <div class="link" id="waitLink"></div>
       <div class="row" id="copyRow"><button class="btn ghost" id="copyBtn">Sao chép link</button></div>
       <div class="seats" id="seatList"></div>
@@ -317,6 +321,7 @@ header .sp{flex:1}
   <header>
     <span class="title">The Mind</span>
     <span class="info" id="roomInfo"></span>
+    <span class="chip net bad hidden" id="netChip" title="Khách đang chơi không bị ảnh hưởng; chỉ người vào lại mới cần máy chủ">🟠 Đang nối lại máy chủ…</span>
     <span class="chip lvc" id="lvlChip"></span>
     <span class="chip" id="livesChip" title="Mạng"></span>
     <span class="chip" id="starsChip" title="Phi tiêu"></span>
@@ -537,7 +542,7 @@ function planBots(){
 const PREFIX="themind-vh-";
 let peer=null, conn=null, isHost=false, myName="", roomCode="", state=null, view=null, joinTimer=null;
 let seats=[];                                   // host: [{name, bot, id, conn}] — ghế 0 là chủ phòng
-let botCount=1, tempoKey="mid";
+let botCount=1, tempoKey="mid", hostOpen=false, joinTries=0;
 const myId=(()=>{ try{ let x=sessionStorage.getItem("tm-id"); if(!x){ x=Math.random().toString(36).slice(2); sessionStorage.setItem("tm-id",x); } return x; }catch(e){ return Math.random().toString(36).slice(2); } })();
 
 const $ = id => document.getElementById(id);
@@ -571,19 +576,41 @@ function createRoom(){
   roomCode=genCode();
   peer=new Peer(PREFIX+roomCode);
   peer.on("open",()=>{
+    setNetStatus();
+    if(hostOpen) return;                         // mở lại sau khi nối lại máy chủ
+    hostOpen=true;
     $("lobbyMain").classList.add("hidden"); $("lobbyWait").classList.remove("hidden");
     $("waitCode").textContent=roomCode; $("waitLink").textContent=roomLink();
     history.replaceState(null,"","?room="+roomCode+"&host=1");
     sendLobby();
   });
   peer.on("connection", onGuestConn);
-  peer.on("disconnected",()=>{ if(!peer.destroyed) peer.reconnect(); });
+  peer.on("disconnected",()=>{ setNetStatus(); setTimeout(ensureHostOnline,1000); });
   peer.on("error",e=>{
-    if(e.type==="unavailable-id"){ peer.destroy(); isHost=false; createRoom(); return; }
     if(e.type==="peer-unavailable") return;
-    console.warn(e); toast("Lỗi kết nối: "+e.type); lockLobby(false);
+    if(hostOpen){ console.warn(e); setNetStatus(); return; }       // giữ mã phòng, vòng kiểm tra sẽ nối lại
+    if(e.type==="unavailable-id"){ peer.destroy(); isHost=false; createRoom(); return; }
+    console.warn(e); lobbyMsg("Không kết nối được máy chủ phòng ("+e.type+"). Thử lại nhé."); peer.destroy(); lockLobby(false);
   });
 }
+// Điện thoại chuyển sang app khác (VD gửi mã qua Zalo) sẽ làm tab rớt khỏi máy chủ PeerJS → khách báo "không tìm thấy phòng".
+// Chủ phòng tự nối lại mỗi khi quay lại tab, khi có mạng lại, và kiểm tra định kỳ.
+function ensureHostOnline(){
+  if(isHost && hostOpen && peer && !peer.destroyed && peer.disconnected){ try{ peer.reconnect(); }catch(e){ console.warn(e); } }
+  setNetStatus();
+}
+function setNetStatus(){
+  if(!isHost || !roomCode) return;
+  const ok = !!(peer && peer.open && !peer.disconnected);
+  const el=$("netStatus");
+  el.className="net "+(ok?"ok":"bad");
+  el.textContent = ok ? "🟢 Phòng đang mở — bạn bè vào được" : "🟠 Mất kết nối máy chủ, đang nối lại… (bạn bè chưa vào được)";
+  $("netChip").classList.toggle("hidden", ok);
+}
+setInterval(ensureHostOnline, 4000);
+document.addEventListener("visibilitychange",()=>{ if(!document.hidden) ensureHostOnline(); });
+window.addEventListener("online", ensureHostOnline);
+window.addEventListener("pageshow", ensureHostOnline);
 function onGuestConn(c){
   c.on("data", msg=>{
     if(!msg||typeof msg!=="object") return;
@@ -645,15 +672,31 @@ function joinRoom(){
   if(typeof Peer==="undefined"){ lobbyMsg("Không tải được thư viện kết nối, kiểm tra mạng."); return; }
   myName=n; roomCode=code; isHost=false; lockLobby(true); lobbyMsg("Đang kết nối…");
   $("lobbyMsg").style.color="var(--muted)";
+  joinTries=0; guestPeer();
+}
+function guestPeer(){
   if(peer) peer.destroy();
   peer=new Peer();
   peer.on("open",()=>connectToHost());
-  peer.on("error",e=>{
-    $("lobbyMsg").style.color="";
-    if(e.type==="peer-unavailable"){ clearTimeout(joinTimer); if(!view){ lobbyMsg("Không tìm thấy phòng "+roomCode+". Kiểm tra lại mã."); lockLobby(false); showLobbyMain(); } else showDisconnected(); }
-    else { console.warn(e); lobbyMsg("Lỗi kết nối: "+e.type); lockLobby(false); }
-  });
+  peer.on("error",onGuestError);
   peer.on("disconnected",()=>{ if(!peer.destroyed) peer.reconnect(); });
+}
+const RETRY=4;
+function onGuestError(e){
+  console.warn(e);
+  if(view){ if(e.type==="peer-unavailable") showDisconnected(); return; }
+  clearTimeout(joinTimer);
+  const lost = e.type==="peer-unavailable";
+  if((lost || ["network","server-error","socket-error","socket-closed"].includes(e.type)) && joinTries<RETRY){
+    joinTries++;
+    $("lobbyMsg").style.color="var(--muted)";
+    lobbyMsg(`${lost?`Chưa thấy phòng ${roomCode}`:"Máy chủ kết nối chập chờn"}, đang thử lại (${joinTries}/${RETRY})…`);
+    setTimeout(()=>{ if(!view) guestPeer(); }, 2000);     // PeerJS chỉ báo peer-unavailable một lần mỗi peer → tạo peer mới
+    return;
+  }
+  $("lobbyMsg").style.color="";
+  lobbyMsg(lost ? `Không tìm thấy phòng ${roomCode}. Kiểm tra lại mã, và nhờ chủ phòng mở lại tab game (đừng tắt tab).` : "Lỗi kết nối: "+e.type);
+  lockLobby(false); showLobbyMain();
 }
 function showLobbyMain(){ $("lobbyWait").classList.add("hidden"); $("lobbyMain").classList.remove("hidden"); }
 function connectToHost(){
